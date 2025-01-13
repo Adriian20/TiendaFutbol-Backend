@@ -81,36 +81,30 @@ public class UserServiceImpl implements UserService {
         // Buscar el usuario por el token
         UsuarioDTO usuario = findByToken(usuarioDTO.getToken());
 
-        if (usuario != null) {
-            // Establecer el token como null
-            usuario.setToken(null);
+        Optional.ofNullable(usuario)
+            .ifPresent(user -> user.setToken(null));
 
-            return usuario;
-        } else {
-            log.info("Usuario no encontrado para el token proporcionado: {}", usuarioDTO.getToken());
-            return null;
-        }
+        return usuario;
     }
 
     @Override
     public void updateUser(UsuarioDTO usuarioDTO, UsuarioDTO userDTO) {
-        if (usuarioDTO.getContrasenya() != null) {
-            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            String encodedPassword = encoder.encode(usuarioDTO.getContrasenya());
-            userDTO.setContrasenya(encodedPassword);
-        }
-        if (usuarioDTO.getEmail() != null) {
-            userDTO.setEmail(usuarioDTO.getEmail());
-        }
-        if (usuarioDTO.getNombre() != null) {
-            userDTO.setNombre(usuarioDTO.getNombre());
-        }
-        if (usuarioDTO.getApellidos() != null) {
-            userDTO.setApellidos(usuarioDTO.getApellidos());
-        }
-        if (usuarioDTO.getCuenta_bancaria() != null) {
-            userDTO.setCuenta_bancaria(usuarioDTO.getCuenta_bancaria());
-        }
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        Optional.ofNullable(usuarioDTO.getContrasenya())
+            .ifPresent(contrasenya -> userDTO.setContrasenya(encoder.encode(contrasenya)));
+
+        Optional.ofNullable(usuarioDTO.getEmail())
+            .ifPresent(userDTO::setEmail);
+
+        Optional.ofNullable(usuarioDTO.getNombre())
+            .ifPresent(userDTO::setNombre);
+
+        Optional.ofNullable(usuarioDTO.getApellidos())
+            .ifPresent(userDTO::setApellidos);
+
+        Optional.ofNullable(usuarioDTO.getCuenta_bancaria())
+            .ifPresent(userDTO::setCuenta_bancaria);
     }
 
     @Transactional
